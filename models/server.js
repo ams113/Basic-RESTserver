@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const { connect } = require('mongoose');
+const { dbConnection } = require('../db/config.db');
 require('colors');
 
 
@@ -11,11 +13,21 @@ class Server {
         this.port = process.env.PORT;
         this.usersPath = '../routes/user';
 
+        // Database connection
+        this.MongoDBconnection();
+        
         // Middlewares
         this.middlewares();
 
         // Routes app
         this.routes();
+    }
+
+    async MongoDBconnection() {
+
+        // Enviorements connections
+        await dbConnection();
+
     }
 
     middlewares() {
