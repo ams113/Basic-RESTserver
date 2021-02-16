@@ -15,6 +15,8 @@ const dbConnection = async() => {
         console.log('>> MongoDB online'.green);
 
     } catch (error) {
+        console.log('[Error] MongoDB connection error'.red);
+
         console.log(error);
         throw new Error('Error!!! no init DB :(');
     }
