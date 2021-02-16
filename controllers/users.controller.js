@@ -55,7 +55,7 @@ const postUser = async(req, res = response ) => {
 
 
 const putUser = async(req, res = response ) => {
-    console.log('----------------------putUser'.yellow);
+
     const { id } = req.params;
     const { _id, password, google, email, ...restBody } = req.body;
 
@@ -83,7 +83,7 @@ const deleteUser = async(req, res = response ) => {
     // const user = await User.findByIdAndDelete( id );
 
     const user = await User.findByIdAndUpdate( id, { state: false, updateAt: new Date() } );
-
+    const userAuth = req.user;
     res.json({
         user
     });

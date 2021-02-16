@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { connect } = require('mongoose');
+const helmet = require("helmet");
 const { dbConnection } = require('../db/config.db');
 require('colors');
 
@@ -11,8 +11,9 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-        this.usersPath = '../routes/user';
-
+        // Paths
+        this.usersPath = '../routes/user.route';
+        this.authPath = '../routes/auth.route';
         // Database connection
         this.MongoDBconnection();
         
@@ -31,6 +32,8 @@ class Server {
     }
 
     middlewares() {
+        // Helmet
+        this.app.use(helmet());
         // CORS
         this.app.use( cors() );
 
@@ -43,6 +46,8 @@ class Server {
     }
 
     routes() {
+        
+        this.app.use('/api/auth', require( this.authPath ));
         this.app.use('/api/users', require( this.usersPath ));
     }
 

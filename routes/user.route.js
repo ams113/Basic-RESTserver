@@ -1,8 +1,11 @@
 const { Router } = require('express');
 const { check, buildCheckFunction  } = require('express-validator');
 const checkParamsAndQuery = buildCheckFunction(['query', 'params']);
-const { validateFields } = require('../middlewares/validate-fields');
+
 const { isValidRole, existEmail, existUserId } = require('../helpers/db-validators');
+
+const { validateFields, validateJWT, isAdminRole, verifyRoles } = require('../middlewares');
+
 const { 
     getUser,
     postUser,
@@ -10,7 +13,6 @@ const {
     patchUser,
     deleteUser
 } = require('../controllers/users.controller');
-
 
 const router = Router();
 
@@ -39,6 +41,9 @@ router.put('/:id', [
 ], putUser);
 
 router.delete('/:id', [
+    validateJWT,
+    verifyRoles('ADMIN_ROLE', 'USER_ROLE'), // example for varius roles.
+    isAdminRole,
     check('id', 'Not is a Mongo id').isMongoId(),
     check('id').custom( existUserId ),
     validateFields
