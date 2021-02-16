@@ -34,8 +34,23 @@ class Server {
     middlewares() {
         // Helmet
         this.app.use(helmet());
+        this.app.use(
+            helmet({
+                // X-Frame-Options: deny
+                frameguard: {
+                    action: "deny",
+                },
+                contentSecurityPolicy: {
+                    directives: {
+                      defaultSrc:["'self'"]
+                    }
+                }
+            })
+        );
         // CORS
         this.app.use( cors() );
+
+        this.app.disable('x-powered-by');
 
         // Body parse request
         this.app.use( express.json() );
