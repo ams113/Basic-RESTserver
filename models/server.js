@@ -1,8 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require("helmet");
-const { dbConnection } = require('../db/config.db');
+const permissionsPolicy = require('permissions-policy')
 require('colors');
+const { dbConnection } = require('../db/config.db');
+
+
 
 
 
@@ -47,6 +50,16 @@ class Server {
                 }
             })
         );
+
+        // PermissionsPolicy
+        this.app.use(permissionsPolicy({
+            features: {
+              fullscreen: ['self'],               // fullscreen=()
+              vibrate: ['none'],                  // vibrate=(none)
+              geolocation: ['none'], 
+            }
+          }));
+
         // CORS
         this.app.use( cors() );
 
