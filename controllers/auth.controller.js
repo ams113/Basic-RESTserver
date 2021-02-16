@@ -46,7 +46,6 @@ const login = async( req, res = response) => {
                 msg
             });
         }
-        console.log('TODO OK');
         // Generate JWT
         const token = await generateJWT( user.id );
 

@@ -6,6 +6,7 @@ const User = require('../models/user.schema');
 
 const validateJWT = async( req = request, res = response, next ) => {
     
+    req.header('[Info] JWT - Header:Authorization ->' + req.header('Authorization'));
 
     try {
         let [bearer, token] = req.header('Authorization').split(' ');
