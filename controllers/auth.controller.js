@@ -1,8 +1,10 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
 require('colors');
+
 const User = require('../models/user.schema');
 const { generateJWT } = require('../helpers/jwt');
+const { googleVerify } = require('../helpers/google-verify');
 
 const login = async( req, res = response) => {
 
@@ -60,11 +62,66 @@ const login = async( req, res = response) => {
         return res.status(500).json({
             msg: 'Boom!!!'
         });
-    }
+    }  
+};
+
+const googleSignin = async( req, res = response) => {
+
+
+    const { id_token } = req.body;
 
     
+    try {
+        const { name, img, email } = await googleVerify( id_token );
+
+        console.log('[Info] googleSignin: googleUser -> ', { name, img, email } );
+
+        let user = await User.findOne( { email } );
+
+        if ( !user ) {
+            // Create new user
+            const googleUser = {
+                name,
+                email,
+                password: '******',
+                img,
+                google: true
+            };
+
+            user = new User( googleUser );
+
+            await user.save(); 
+
+            console.log('[Info] save: USER -> ' + user);
+        }
+
+        // User deleted
+        if ( !user.state ) {
+            console.log('[Error] authController: googleSignin: -> User deleted'.red);
+            return res.status(401).json({
+                msg: 'User deleted'
+            });
+
+        }
+
+        // Generate JWT
+        const token = await generateJWT( user.id );
+
+        res.json({
+            user,
+            token
+        });
+
+
+    } catch (error) {
+        console.log('[Error] authController: googleSignin: -> Invalid Token'.red);
+        return res.status(400).json({
+            msg: 'Invalid Token'
+        });
+    }
 };
 
 module.exports = {
-    login
+    login,
+    googleSignin
 };

@@ -36,8 +36,8 @@ class Server {
 
     middlewares() {
         // Helmet
-        this.app.use(helmet());
-        this.app.use(
+        // this.app.use(helmet());
+        /* this.app.use(
             helmet({
                 // X-Frame-Options: deny
                 frameguard: {
@@ -45,18 +45,20 @@ class Server {
                 },
                 contentSecurityPolicy: {
                     directives: {
-                      defaultSrc:["'self'"]
+                        
+                      defaultSrc:["'none'"],
+                      scriptSrc:["'none'",'https://apis.google.com/js/platform.js'],
+                      objectSrc: ["'none'"],
+                      upgradeInsecureRequests: [],
                     }
                 }
             })
-        );
+        ); */
 
         // PermissionsPolicy
         this.app.use(permissionsPolicy({
             features: {
               fullscreen: ['self'],               // fullscreen=()
-              vibrate: ['none'],                  // vibrate=(none)
-              geolocation: ['none'], 
             }
           }));
 
