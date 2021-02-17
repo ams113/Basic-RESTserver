@@ -36,7 +36,7 @@ class Server {
 
     middlewares() {
         // Helmet
-        // this.app.use(helmet());
+        this.app.use(helmet());
         /* this.app.use(
             helmet({
                 // X-Frame-Options: deny
