@@ -7,7 +7,7 @@ const getUser = async(req = request, res = response ) => {
 
     // TODO: validar los parametros opcionales
 
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 0, limit = 10 } = req.query;
     const query = { state: true };
 
     /* const users = await User.find( query )
@@ -25,8 +25,8 @@ const getUser = async(req = request, res = response ) => {
 
 
     res.json({
-        page: page,
-        per_page: limit,
+        page: Number( page ),
+        per_page: Number(limit),
         total,
         users
     });
@@ -48,7 +48,6 @@ const postUser = async(req, res = response ) => {
     await user.save();
     console.log('[Info] save: USER -> ' + user);
     res.status(201).json({
-        msg: 'post API - controller Users',
         user
     });
 };
@@ -67,12 +66,12 @@ const putUser = async(req, res = response ) => {
         restBody.password = bcrypt.hashSync( password, salt );
     }
 
-    const user = await User.findByIdAndUpdate( id, restBody );
+    restBody.updateAt = new Date();
 
-
+    const user = await User.findByIdAndUpdate( id, restBody, { new: true } );
+                                                
     res.json({
-        msg: 'put API - controller Users',
-        id
+        user
     });
 };
 
@@ -82,16 +81,15 @@ const deleteUser = async(req, res = response ) => {
     // realy delete
     // const user = await User.findByIdAndDelete( id );
 
-    const user = await User.findByIdAndUpdate( id, { state: false, updateAt: new Date() } );
-    const userAuth = req.user;
-    res.json({
-        user
-    });
-};
+    const user = await User.findByIdAndUpdate( id, 
+                        { state: false, updateAt: new Date() },
+                        { new: true } );
 
-const patchUser = (req, res = response ) => {
+    const userAuth = req.user;
+
     res.json({
-        msg: 'patch API - controller Users'
+        user,
+        DeletedBy: userAuth
     });
 };
 
@@ -99,6 +97,5 @@ module.exports = {
     getUser,
     postUser,
     putUser,
-    patchUser,
     deleteUser
 };

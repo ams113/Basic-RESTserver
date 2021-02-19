@@ -10,7 +10,6 @@ const {
     getUser,
     postUser,
     putUser,
-    patchUser,
     deleteUser
 } = require('../controllers/users.controller');
 
@@ -42,18 +41,13 @@ router.put('/:id', [
 
 router.delete('/:id', [
     validateJWT,
-    verifyRoles('ADMIN_ROLE', 'USER_ROLE'), // example for varius roles.
+    verifyRoles('ADMIN_ROLE', 'USER_ROLE'), // example for various roles.
     isAdminRole,
     check('id', 'Not is a Mongo id').isMongoId(),
     check('id').custom( existUserId ),
     validateFields
 ],
 deleteUser);
-
-router.patch('/', patchUser);
-
-
-
 
 
 

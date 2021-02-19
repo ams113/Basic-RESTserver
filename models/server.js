@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require("helmet");
-const permissionsPolicy = require('permissions-policy')
+const permissionsPolicy = require('permissions-policy');
 require('colors');
 const { dbConnection } = require('../db/config.db');
 
@@ -15,8 +15,14 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         // Paths
-        this.usersPath = '../routes/user.route';
-        this.authPath = '../routes/auth.route';
+        this.paths = {
+            auth:       [ '/api/auth', '../routes/auth.route' ],
+            categories: [ '/api/categories', '../routes/categories.route' ],
+            products:   [ '/api/products', '../routes/products.route' ],
+            search:   [ '/api/search', '../routes/search.route' ],
+            users:      [ '/api/users', '../routes/users.route' ],
+        };
+
         // Database connection
         this.MongoDBconnection();
         
@@ -37,6 +43,9 @@ class Server {
     middlewares() {
         // Helmet
         this.app.use(helmet());
+        this.app.use(helmet.hidePoweredBy({ setTo: 'CULO 5.5'}));
+        this.app.use(helmet.frameguard({ action: 'deny'}));
+
         /* this.app.use(
             helmet({
                 // X-Frame-Options: deny
@@ -58,14 +67,17 @@ class Server {
         // PermissionsPolicy
         this.app.use(permissionsPolicy({
             features: {
-              fullscreen: ['self'],               // fullscreen=()
+              fullscreen:   ['self'],
+              microphone:   ['none'],               
+              camera:       ['none'],
+              geolocation:  ['none']               
             }
           }));
 
         // CORS
         this.app.use( cors() );
 
-        this.app.disable('x-powered-by');
+        // this.app.disable('x-powered-by');
 
         // Body parse request
         this.app.use( express.json() );
@@ -77,8 +89,11 @@ class Server {
 
     routes() {
         
-        this.app.use('/api/auth', require( this.authPath ));
-        this.app.use('/api/users', require( this.usersPath ));
+        this.app.use(this.paths.auth[0], require( this.paths.auth[1] ));
+        this.app.use(this.paths.categories[0], require( this.paths.categories[1] ));
+        this.app.use(this.paths.products[0], require( this.paths.products[1] ));
+        this.app.use(this.paths.search[0], require( this.paths.search[1] ));
+        this.app.use(this.paths.users[0], require( this.paths.users[1] ));
     }
 
     listen() {
