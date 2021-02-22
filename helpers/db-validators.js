@@ -113,6 +113,15 @@ const existProductId = async( id ) => {
     
 };
 
+// validate allowed collections
+const allowCollections = async( name = '', collections = [] ) => {
+
+        const isValid = collections.includes( name );
+
+        if ( !isValid ) {
+            throw new Error(`The ${ name } collection is not allowed, the valid ones are ${ collections }`);
+        }
+};
 
 module.exports = {
     isValidRole,
@@ -120,5 +129,6 @@ module.exports = {
     existUserId,
     existCategoryId,
     existCategory,
-    existProductId
+    existProductId,
+    allowCollections
 };

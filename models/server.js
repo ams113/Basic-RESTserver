@@ -4,9 +4,7 @@ const helmet = require("helmet");
 const permissionsPolicy = require('permissions-policy');
 require('colors');
 const { dbConnection } = require('../db/config.db');
-
-
-
+const fileUpload = require('express-fileupload');
 
 
 class Server {
@@ -19,7 +17,8 @@ class Server {
             auth:       [ '/api/auth', '../routes/auth.route' ],
             categories: [ '/api/categories', '../routes/categories.route' ],
             products:   [ '/api/products', '../routes/products.route' ],
-            search:   [ '/api/search', '../routes/search.route' ],
+            search:     [ '/api/search', '../routes/search.route' ],
+            uploads:    [ '/api/uploads', '../routes/uploads.route' ],
             users:      [ '/api/users', '../routes/users.route' ],
         };
 
@@ -85,15 +84,23 @@ class Server {
         // Public directory
         this.app.use( express.static('public') );
 
+        // FileUploads
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/',
+            createParentPath: true
+        }));
+
     }
 
     routes() {
         
-        this.app.use(this.paths.auth[0], require( this.paths.auth[1] ));
-        this.app.use(this.paths.categories[0], require( this.paths.categories[1] ));
-        this.app.use(this.paths.products[0], require( this.paths.products[1] ));
-        this.app.use(this.paths.search[0], require( this.paths.search[1] ));
-        this.app.use(this.paths.users[0], require( this.paths.users[1] ));
+        this.app.use( this.paths.auth[0],        require( this.paths.auth[1] ));
+        this.app.use( this.paths.categories[0],  require( this.paths.categories[1] ));
+        this.app.use( this.paths.products[0],    require( this.paths.products[1] ));
+        this.app.use( this.paths.search[0],      require( this.paths.search[1] ));
+        this.app.use( this.paths.uploads[0],     require( this.paths.uploads[1] ));
+        this.app.use( this.paths.users[0],       require( this.paths.users[1] ));
     }
 
     listen() {

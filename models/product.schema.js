@@ -32,6 +32,9 @@ const ProductSchema = Schema({
         type: Boolean,
         default: true,
     },
+    img: {
+        type: String,
+    },
     createAt: {
         type: Date, 
         default: Date.now 
