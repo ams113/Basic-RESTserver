@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const { createServer } = require('http');
 const helmet = require("helmet");
 const permissionsPolicy = require('permissions-policy');
 require('colors');
 const { dbConnection } = require('../db/config.db');
 const fileUpload = require('express-fileupload');
+
+const { socketCtrl } = require('../controllers/socket.controller');
 
 
 class Server {
@@ -12,6 +15,11 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
+        //sockets
+        this.server = createServer( this.app );
+        this.io = require('socket.io')( this.server );
+
+
         // Paths
         this.paths = {
             auth:       [ '/api/auth', '../routes/auth.route' ],
@@ -30,6 +38,9 @@ class Server {
 
         // Routes app
         this.routes();
+
+        // Sockets app
+        this.sockets();
     }
 
     async MongoDBconnection() {
@@ -41,9 +52,9 @@ class Server {
 
     middlewares() {
         // Helmet
-        this.app.use(helmet());
-        this.app.use(helmet.hidePoweredBy({ setTo: 'CULO 5.5'}));
-        this.app.use(helmet.frameguard({ action: 'deny'}));
+        // this.app.use(helmet());
+        // this.app.use(helmet.hidePoweredBy({ setTo: 'CULO 5.5'}));
+        // this.app.use(helmet.frameguard({ action: 'deny'}));
 
         /* this.app.use(
             helmet({
@@ -64,14 +75,14 @@ class Server {
         ); */
 
         // PermissionsPolicy
-        this.app.use(permissionsPolicy({
+        /* this.app.use(permissionsPolicy({
             features: {
               fullscreen:   ['self'],
               microphone:   ['none'],               
               camera:       ['none'],
               geolocation:  ['none']               
             }
-          }));
+          })); */
 
         // CORS
         this.app.use( cors() );
@@ -103,8 +114,12 @@ class Server {
         this.app.use( this.paths.users[0],       require( this.paths.users[1] ));
     }
 
+    sockets() {
+        this.io.on('connection', ( socket ) => socketCtrl( socket, this.io) );
+    }
+
     listen() {
-        this.app.listen(this.port,
+        this.server.listen(this.port,
             () => console.log(`CORS-enabled server running at ${'http://localhost:'.yellow}${this.port.toString().yellow}`));
     }
 

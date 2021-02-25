@@ -17,7 +17,7 @@ const login = async( req, res = response) => {
         console.log('[Info] findOne: email -> ' + user);
        
         if ( !user ) {
-            const msg ='Invalid Email / Password - email';
+            const msg ='Invalid Email / Password';
             const log ='[error]  Login: Email -> False';
             console.log( log.red );
     
@@ -40,7 +40,7 @@ const login = async( req, res = response) => {
         const checkPass = bcrypt.compareSync( password, user.password );
 
         if ( !checkPass ) {
-            const msg ='Invalid Email / Password - password';
+            const msg ='Invalid Email / Password';
             const log ='[error]  Login: checkPass -> False';
             console.log( log.red );
 
@@ -121,7 +121,21 @@ const googleSignin = async( req, res = response) => {
     }
 };
 
+const renewToken = async( req, res = response) => {
+
+    const { user } = req;
+
+    const token = await generateJWT( user.id );
+
+    res.json({
+        user,
+        token
+    });
+
+};
+
 module.exports = {
     login,
-    googleSignin
+    googleSignin,
+    renewToken,
 };
